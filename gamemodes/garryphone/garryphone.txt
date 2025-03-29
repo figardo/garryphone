@@ -1,0 +1,8 @@
+"garryicphone"
+{
+	"base"		"base"
+	"title"		"Garry Phone"
+	"category"	"other"
+	"maps"		""
+	"menusystem"	"1"
+}
