@@ -74,9 +74,6 @@ local function DrawLobbyScreen()
 	local x, y = scrw * 0.3, scrh * 0.085
 	local w, h = scrw * 0.4, scrh * 0.12
 
-	surface.SetTextColor(255, 255, 255)
-	surface.SetFont("GPTitle")
-
 	-- logo
 	surface.SetDrawColor(255, 255, 255, 255)
 	surface.SetMaterial(logo)
@@ -620,7 +617,6 @@ function GM:TwoSidedMenu(isReplay)
 		surface.SetFont("GPTitle")
 
 		local txt = isReplay and self.AlbumText or settingsTxt
-		print(txt, self.AlbumText)
 		local th = select(2, surface.GetTextSize(txt))
 		surface.SetTextPos(scrw * 0.01, (h / 2) - (th / 2))
 
