@@ -77,6 +77,12 @@ local statePaintFuncs = {
 	[STATE_BUILD] = function(gm)
 		if gm.MenuOpen then gm.MenuOpen = false end
 
+		local ent = gm.ReadyMark
+		if IsValid(gm.ReadyMark) then
+			local text = language.GetPhrase("GarryPhone.Spawn"):format(input.LookupBinding("gm_showspare1"))
+			AddWorldTip( nil, text, nil, ent:GetPos(), ent )
+		end
+
 		return 0.1, "#GarryPhone.Build", true
 	end,
 	[STATE_POST] = function(gm)
@@ -87,7 +93,7 @@ local statePaintFuncs = {
 				local lastdata = #rdata
 				if lastdata >= 3 and lastdata % 2 != 0 then
 					local ent = rdata[lastdata - 1].data
-					if IsValid(ent) and isentity(ent) then
+					if ent and IsValid(ent) and isentity(ent) then
 						local data = rdata[lastdata]
 						local author = isentity(data.author) and data.author:Nick() or data.author
 						local text = language.GetPhrase("GarryPhone.ThoughtThisWas"):format(author, data.data)
