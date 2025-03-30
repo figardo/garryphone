@@ -458,16 +458,17 @@ function GM:CreatePromptScreen()
 	pnl:Center()
 
 	pnl:MakePopup()
-	pnl:SetPaintedManually(true)
 
 	local dtext = vgui.Create("DTextEntry", pnl)
 	dtext:SetSize(scrw * 0.6, scrh * 0.04)
 	dtext:SetFont("GPTextEntry")
 
 	dtext:Center()
-	dtext:SetPaintedManually(true)
 
-	if !firstPrompt then
+	if firstPrompt then
+		pnl:SetPaintedManually(true)
+		dtext:SetPaintedManually(true)
+	else
 		pnl:SetMouseInputEnabled(false)
 		pnl:SetKeyboardInputEnabled(false)
 
