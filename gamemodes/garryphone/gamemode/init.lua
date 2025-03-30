@@ -38,6 +38,7 @@ util.AddNetworkString("GP_BackToLobby")
 util.AddNetworkString("GP_ChangeSetting")
 util.AddNetworkString("GP_Ready")
 util.AddNetworkString("GP_SaveGame")
+util.AddNetworkString("GP_SetSpawn")
 
 function GM:InitPostEntity()
 	local callbacks = concommand.GetTable()

@@ -137,22 +137,6 @@ function GM:Think()
 	surface.PlaySound(snd)
 end
 
-function GM:OnEntityCreated(ent)
-	local roundData = self.RoundData
-	if !roundData then return end
-
-	roundData = roundData[self.CurPly]
-	if !roundData then return end
-
-	local lastdata = #roundData
-	local idx = roundData[lastdata].data
-	if !isnumber(idx) then return end
-
-	if ent:EntIndex() != idx then return end
-
-	roundData[lastdata].data = ent
-end
-
 local function ReceivePrompt()
 	local prompt = net.ReadString()
 	prompt = prompt or ""
@@ -181,23 +165,23 @@ local function ShowResults()
 end
 net.Receive("GP_ShowResults", ShowResults)
 
-local function Ready()
-	local ready = net.ReadBool()
-	GAMEMODE.Ready = ready
+function GM:SetMark(pos, y)
+	local mark = self.ReadyMark
 
-	if ready then
-		local mark = GAMEMODE.ReadyMark
-
-		if IsValid(mark) then
-			mark:Remove()
-		end
-
-		mark = ClientsideModel("models/editor/playerstart.mdl")
-		mark:SetPos(net.ReadVector())
-		mark:SetAngles(Angle(0, net.ReadFloat(), 0))
-		mark:Spawn()
-
-		GAMEMODE.ReadyMark = mark
+	if IsValid(mark) then
+		mark:Remove()
 	end
+
+	mark = ClientsideModel("models/editor/playerstart.mdl")
+	mark:SetPos(pos)
+	mark:SetAngles(Angle(0, y, 0))
+	mark:Spawn()
+
+	self.ReadyMark = mark
+end
+net.Receive("GP_SetSpawn", function() GAMEMODE:SetMark(net.ReadVector(), net.ReadFloat()) end)
+
+local function Ready()
+	GAMEMODE.Ready = net.ReadBool()
 end
 net.Receive("GP_Ready", Ready)

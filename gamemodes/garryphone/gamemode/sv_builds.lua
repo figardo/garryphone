@@ -63,6 +63,12 @@ function GM:GetReady(ply)
 	return self.Ready[ply:SteamID64()]
 end
 
+function GM:ShowSpare1(ply)
+	if GetRoundState() != STATE_BUILD then return end
+
+	ply:SetBuildSpawn()
+end
+
 function GM:ShowSpare2(ply)
 	if GetRoundState() != STATE_BUILD then return end
 
@@ -70,17 +76,11 @@ function GM:ShowSpare2(ply)
 	self:SetReady(ply, !old)
 
 	if !old then
-		ply.BuildSpawn = {}
-		ply.BuildSpawn.pos = ply:GetPos()
-		ply.BuildSpawn.ang = ply:GetAngles()
+		ply:SetBuildSpawn()
 	end
 
 	net.Start("GP_Ready")
 		net.WriteBool(!old)
-		if !old then
-			net.WriteVector(ply.BuildSpawn.pos)
-			net.WriteFloat(ply.BuildSpawn.ang.y)
-		end
 	net.Send(ply)
 end
 

@@ -175,6 +175,7 @@ function GM:SwitchToBuild(curRound)
 		if !IsValid(ply) then continue end
 
 		ply:Spawn()
+		ply:SetBuildSpawn()
 
 		self.Ready[sid] = false
 
