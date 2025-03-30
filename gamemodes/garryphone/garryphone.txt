@@ -1,8 +1,9 @@
-"garryicphone"
+"garryphone"
 {
-	"base"		"base"
+	"base"		"sandbox"
 	"title"		"Garry Phone"
 	"category"	"other"
 	"maps"		""
 	"menusystem"	"1"
+	"workshopid" "3412481462"
 }
