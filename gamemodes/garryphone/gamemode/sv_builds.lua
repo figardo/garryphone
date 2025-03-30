@@ -5,15 +5,15 @@ function GM:SaveBuilds(round, asdupe)
 		local ply = player.GetByUniqueID(id)
 		if !IsValid(player.GetByUniqueID(id)) or !data[1] then continue end
 
-		-- TODO: Fix error when muscle constraint attached to world
-		local build = {} -- game.GetWorld()?
+		local build = {}
 		for i = 1, #data do
 			data[i].Lock = true
 
 			local props = data[i].Entities
 			for j = 1, #props do
 				local prop = props[j]
-				if !IsValid(prop) then continue end
+				-- HACK: there's probably a better way to ignore ents created for a constraint
+				if !IsValid(prop) or prop:IsConstraint() or prop:GetClass() == "gmod_winch_controller" then continue end
 
 				build[#build + 1] = prop
 			end
