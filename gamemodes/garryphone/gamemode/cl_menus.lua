@@ -419,22 +419,22 @@ local function SendPrompt(firstPrompt, pnl, txt)
 end
 
 local examples = {
-	"GarryPhone.Example.Breen",
-	"GarryPhone.Example.Kleiner",
-	"GarryPhone.Example.Barney",
-	"GarryPhone.Example.Male07",
-	"GarryPhone.Example.Eli",
-	"GarryPhone.Example.Zombie",
-	"GarryPhone.Example.GMan",
-	"GarryPhone.Example.Grigori",
-	"GarryPhone.Example.Mossman",
-	"GarryPhone.Example.Alyx",
-	"GarryPhone.Example.MingeBag",
-	"GarryPhone.Example.John",
-	"GarryPhone.Example.Hax",
-	"GarryPhone.Example.CS4K",
-	"GarryPhone.Example.sbox",
-	"GarryPhone.Example.Liminal"
+	"Breen",
+	"Kleiner",
+	"Barney",
+	"Male07",
+	"Eli",
+	"Zombie",
+	"GMan",
+	"Grigori",
+	"Mossman",
+	"Alyx",
+	"MingeBag",
+	"John",
+	"Hax",
+	"CS4K",
+	"sbox",
+	"Liminal"
 }
 
 function GM:CreatePromptScreen()
@@ -475,7 +475,7 @@ function GM:CreatePromptScreen()
 		pnl:SetY(scrh * 0.95)
 	end
 
-	local placeholder = firstPrompt and language.GetPhrase("GarryPhone.eg") .. " " .. language.GetPhrase(examples[math.random(#examples)]) or language.GetPhrase("GarryPhone.Type"):format(input.LookupBinding("+menu"))
+	local placeholder = firstPrompt and language.GetPhrase("GarryPhone.eg") .. " " .. language.GetPhrase("GarryPhone.Example." .. examples[math.random(#examples)]) or language.GetPhrase("GarryPhone.Type"):format(input.LookupBinding("+menu"))
 	dtext:SetPlaceholderText(placeholder)
 
 	dtext:SetMaximumCharCount(60)
