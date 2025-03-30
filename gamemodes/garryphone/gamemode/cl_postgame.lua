@@ -325,8 +325,8 @@ local function ReceiveRound()
 	local isPrompt = roundType == STATE_PROMPT
 
 	local data
-	if net.ReadBool() then
-		data = isPrompt and net.ReadString() or net.ReadUInt(MAX_EDICT_BITS)
+	if net.ReadBool() and isPrompt then
+		data = net.ReadString()
 	end
 
 	local roundData = gm.RoundData
@@ -359,3 +359,15 @@ local function ReceiveRound()
 	parent:AddItem(gm:CreateReplayEntry(gm.CurPly, gm.CurRound))
 end
 net.Receive("GP_SendRound", ReceiveRound)
+
+local function ShowBuild()
+	local idx = net.ReadUInt(MAX_EDICT_BITS)
+	if !isnumber(idx) then return end
+
+	local ent = Entity(idx)
+	if !IsValid(ent) then return end
+
+	local gm = GAMEMODE
+	gm.RoundData[gm.CurPly][gm.CurRound].data = ent
+end
+net.Receive("GP_ShowBuild", ShowBuild)
