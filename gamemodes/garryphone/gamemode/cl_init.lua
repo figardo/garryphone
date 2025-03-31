@@ -17,30 +17,35 @@ local function GenerateFonts()
 	surface.CreateFont("GPTargetID", {
 		font = "Comic Sans MS",
 		size = ScreenScaleH(15),
-		outline = true
+		outline = true,
+		extended = true
 	})
 
 	surface.CreateFont("GPTextEntry", {
 		font = "Comic Sans MS",
-		size = ScreenScaleH(15)
+		size = ScreenScaleH(15),
+		extended = true
 	})
 
 	surface.CreateFont("GPBoldSmall", {
 		font = "Comic Sans MS",
 		size = ScreenScaleH(15),
-		weight = 900
+		weight = 900,
+		extended = true
 	})
 
 	surface.CreateFont("GPTitle", {
 		font = "Comic Sans MS",
 		size = ScreenScaleH(20),
-		outline = true
+		outline = true,
+		extended = true
 	})
 
 	surface.CreateFont("GPBold", {
 		font = "Comic Sans MS",
 		size = ScreenScaleH(25),
-		weight = 900
+		weight = 900,
+		extended = true
 	})
 end
 GenerateFonts()
