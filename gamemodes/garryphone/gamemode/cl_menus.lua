@@ -475,7 +475,8 @@ function GM:CreatePromptScreen()
 		pnl:SetY(scrh * 0.95)
 	end
 
-	local placeholder = firstPrompt and language.GetPhrase("GarryPhone.eg") .. " " .. language.GetPhrase("GarryPhone.Example." .. examples[math.random(#examples)]) or language.GetPhrase("GarryPhone.Type"):format(input.LookupBinding("+menu"))
+	local menubtn = input.LookupBinding("+menu") or "not bound"
+	local placeholder = firstPrompt and language.GetPhrase("GarryPhone.eg") .. " " .. language.GetPhrase("GarryPhone.Example." .. examples[math.random(#examples)]) or language.GetPhrase("GarryPhone.Type"):format(menubtn:upper())
 	dtext:SetPlaceholderText(placeholder)
 
 	dtext:SetMaximumCharCount(60)

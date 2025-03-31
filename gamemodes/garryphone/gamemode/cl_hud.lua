@@ -58,7 +58,8 @@ local statePaintFuncs = {
 		local txt = language.GetPhrase("GarryPhone.Welcome")
 
 		local phrase = LocalPlayer():HasAuthority() and "GarryPhone.Configure" or "GarryPhone.Lobby"
-		local key = input.LookupBinding("+showscores"):upper()
+		local key = input.LookupBinding("+showscores") or "not bound"
+		key = key:upper()
 
 		txt = txt .. " " .. language.GetPhrase(phrase):format(key)
 
@@ -79,7 +80,8 @@ local statePaintFuncs = {
 
 		local ent = gm.ReadyMark
 		if IsValid(gm.ReadyMark) then
-			local text = language.GetPhrase("GarryPhone.Spawn"):format(input.LookupBinding("gm_showspare1"))
+			local showspare1 = input.LookupBinding("gm_showspare1") or "NOT BOUND"
+			local text = language.GetPhrase("GarryPhone.Spawn"):format(showspare1)
 			AddWorldTip( nil, text, nil, ent:GetPos(), ent )
 		end
 
@@ -110,7 +112,8 @@ local statePaintFuncs = {
 
 local statePostPaintFuncs = {
 	[STATE_BUILD] = function(gm, scrw, scrh)
-		local txt = language.GetPhrase("GarryPhone.Ready") .. " (" .. input.LookupBinding("gm_showspare2"):upper() .. ") " .. (gm.Ready and "[✓]" or "[ ]")
+		local showspare2 = input.LookupBinding("gm_showspare2") or "not bound"
+		local txt = language.GetPhrase("GarryPhone.Ready") .. " (" .. showspare2:upper() .. ") " .. (gm.Ready and "[✓]" or "[ ]")
 
 		surface.SetTextColor(255, 255, 255, 255)
 		surface.SetFont("GPTargetID")
