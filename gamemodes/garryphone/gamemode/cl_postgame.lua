@@ -270,7 +270,7 @@ function GM:CreateEndButtons()
 	end
 
 	local txt = self.RoundSaved and "#GarryPhone.Saved" or "#GarryPhone.Save"
-	local saveGame = self:CreateMenuButton(txt, ScrW() * 0.45, self.RoundSaved)
+	local saveGame = self:CreateMenuButton(txt, ScrW() * 0.65, self.RoundSaved)
 
 	if !self.RoundSaved then
 		saveGame.DoClick = function(s)
@@ -279,7 +279,7 @@ function GM:CreateEndButtons()
 
 			s:Remove()
 
-			self:CreateMenuButton("#GarryPhone.Saved", ScrW() * 0.45, true)
+			self:CreateMenuButton("#GarryPhone.Saved", ScrW() * 0.65, true)
 
 			self.RoundSaved = true
 		end

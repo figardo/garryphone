@@ -18,7 +18,7 @@ local tex_corner32	= surface.GetTextureID("gui/inv_corner32")
 local tex_corner64	= surface.GetTextureID("gui/inv_corner64")
 local tex_corner512	= surface.GetTextureID("gui/inv_corner512")
 
-SHADERS = GetConVar("mat_dxlevel"):GetInt() >= 90 and jit.os == "Windows"
+SHADERS = GetConVar("mat_dxlevel"):GetInt() >= 90
 
 local RNDX = SHADERS and include("vgui/rndx.lua")
 if SHADERS then roundedBG = Color(57, 0, 81, 75) end
@@ -217,10 +217,14 @@ local ssh16 = ScreenScaleH(16)
 function GM:CreateMenuButton(txt, x, notButton)
 	local scrw, scrh = ScrW(), ScrH()
 
+	surface.SetFont("GPBold")
+	local tx, ty = surface.GetTextSize(txt)
+	local sizex = math.max(scrw * 0.2, tx + ssh16)
+
 	local class = notButton and "DPanel" or "DButton"
 	local start = vgui.Create(class, self.MenuPanel)
-	start:SetPos(x or scrw * 0.675, scrh * 0.825)
-	start:SetSize(scrw * 0.2, scrh * 0.075)
+	start:SetPos((x or scrw * 0.875) - sizex, scrh * 0.825)
+	start:SetSize(sizex, scrh * 0.075)
 	start:SetText("")
 	start:SetPaintedManually(true)
 
@@ -237,7 +241,6 @@ function GM:CreateMenuButton(txt, x, notButton)
 		surface.SetTextColor(255, 255, 255)
 		surface.SetFont("GPBold")
 
-		local tx, ty = surface.GetTextSize(txt)
 		surface.SetTextPos((w / 2) - (tx / 2), (h / 2) - (ty / 2))
 
 		surface.DrawText(txt)
@@ -405,6 +408,8 @@ function GM:CreateLobbyScreen()
 
 			settingsPnl:AddItem(setting)
 		end
+	else
+		self:CreateMenuButton("#GarryPhone.WaitingForHost", nil, true)
 	end
 end
 
