@@ -18,7 +18,7 @@ local tex_corner32	= surface.GetTextureID("gui/inv_corner32")
 local tex_corner64	= surface.GetTextureID("gui/inv_corner64")
 local tex_corner512	= surface.GetTextureID("gui/inv_corner512")
 
-SHADERS = GetConVar("mat_dxlevel"):GetInt() >= 90 and jit.os == "Windows"
+SHADERS = GetConVar("mat_dxlevel"):GetInt() >= 90
 local RNDX = SHADERS and include("vgui/rndx.lua")
 if SHADERS then roundedBG = Color(57, 0, 81, 75) end
 
