@@ -13,6 +13,23 @@ function GM:Initialize()
 	self.LobbyOpen = false
 end
 
+local function RemoveHooks(name)
+	for id, _ in pairs(hook.GetTable()[name]) do
+		hook.Remove(name, id)
+	end
+end
+
+local hooksToRemove = {
+	"ScoreboardShow",
+	"ScoreboardHide"
+}
+
+function GM:InitPostEntity()
+	for i = 1, #hooksToRemove do
+		RemoveHooks(hooksToRemove[i])
+	end
+end
+
 local function GenerateFonts()
 	surface.CreateFont("GPTargetID", {
 		font = "Comic Sans MS",
