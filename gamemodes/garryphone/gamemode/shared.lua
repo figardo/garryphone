@@ -9,7 +9,7 @@ GM.Settings = {
 	{name = "InfiniteTime", cvar = "gp_infinitetime", type = "checkbox", default = 0, help = "How long are players given to type a prompt?", replicated = true, grey = {cvars = {2, 3}, val = true}},
 	{name = "PromptTime", cvar = "gp_prompttime", type = "num", default = "30", help = "How long are players given to type a prompt?"},
 	{name = "BuildTime", cvar = "gp_buildtime", type = "num", default = "120", help = "How long are players given to build?"},
-	{name = "LobbyPVP", cvar = "gp_lobbypvp", type = "checkbox", default = "0", help = "Should players be allowed to kill each other in the lobby?"}
+	{name = "LobbyPVP", cvar = "gp_lobbypvp", type = "checkbox", default = 0, help = "Should players be allowed to kill each other in the lobby?"}
 }
 
 function GM:CreateConVars()
@@ -20,7 +20,7 @@ function GM:CreateConVars()
 		if CLIENT and !dedicated and !setting.replicated then continue end
 
 		local flags = CLIENT and FCVAR_REPLICATED or FCVAR_ARCHIVE
-		if SERVER and setting.replicated then
+		if SERVER and (setting.replicated or dedicated) then
 			flags = flags + FCVAR_REPLICATED
 		end
 
