@@ -28,6 +28,8 @@ local hooksToRemove = {
 }
 
 function GM:InitPostEntity()
+	self:CreateConVars()
+
 	for i = 1, #hooksToRemove do
 		RemoveHooks(hooksToRemove[i])
 	end
@@ -127,10 +129,14 @@ local stateSwitchFuncs = {
 	end
 }
 
-local infiniteTime = GetConVar("gp_infinitetime")
+local infiniteTime
 local rs, lastAlert
 function GM:Think()
 	local newrs = GetRoundState()
+
+	if !infiniteTime then
+		infiniteTime = GetConVar("gp_infinitetime")
+	end
 
 	if (newrs == STATE_PROMPT or newrs == STATE_BUILD) and !infiniteTime:GetBool() then
 		local time = math.ceil(math.max(0, GetRoundTime() - CurTime()))

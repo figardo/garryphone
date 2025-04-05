@@ -62,8 +62,12 @@ function GM:GetFallDamage()
 	return 0
 end
 
-local lobbyPVP = CreateConVar("gp_lobbypvp", "0", FCVAR_ARCHIVE, "Should players be allowed to kill each other in the lobby?", 0, 1)
+local lobbyPVP
 function GM:PlayerShouldTakeDamage()
+	if !lobbyPVP then
+		lobbyPVP = GetConVar("gp_lobbypvp")
+	end
+
 	local rs = GetRoundState()
 	if rs == STATE_LOBBY then return lobbyPVP:GetBool() end
 
@@ -182,16 +186,13 @@ local function ChangeSetting(_, ply)
 	if GetRoundState() != STATE_LOBBY or !ply:HasAuthority() then return end
 
 	local settings = GAMEMODE.Settings
-	local cvar = settings[net.ReadUInt(bitsRequired(#settings)) + 1]
-	if !cvar then return end
+	local setting = settings[net.ReadUInt(bitsRequired(#settings)) + 1]
+	if !setting then return end
 
-	cvar = GetConVar(cvar.cvar)
-
-	local min = cvar:GetMin()
-	local max = cvar:GetMax()
-	if max and max == 1 then
+	local cvar = GetConVar(setting.cvar)
+	if setting.type == "checkbox" then
 		cvar:SetBool(!cvar:GetBool())
-	elseif min then
+	elseif setting.type == "num" then
 		cvar:SetInt(net.ReadUInt(32))
 	else
 		cvar:SetString(net.ReadString())

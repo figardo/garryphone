@@ -6,11 +6,27 @@ GM.Name = "Garry Phone"
 GM.Author = "figardo"
 
 GM.Settings = {
-	{name = "InfiniteTime", cvar = "gp_infinitetime", type = "checkbox", grey = {cvars = {2, 3}, val = true}},
-	{name = "PromptTime", cvar = "gp_prompttime", type = "num"},
-	{name = "BuildTime", cvar = "gp_buildtime", type = "num"},
-	{name = "LobbyPVP", cvar = "gp_lobbypvp", type = "checkbox"}
+	{name = "InfiniteTime", cvar = "gp_infinitetime", type = "checkbox", default = 0, help = "How long are players given to type a prompt?", replicated = true, grey = {cvars = {2, 3}, val = true}},
+	{name = "PromptTime", cvar = "gp_prompttime", type = "num", default = "30", help = "How long are players given to type a prompt?"},
+	{name = "BuildTime", cvar = "gp_buildtime", type = "num", default = "120", help = "How long are players given to build?"},
+	{name = "LobbyPVP", cvar = "gp_lobbypvp", type = "checkbox", default = "0", help = "Should players be allowed to kill each other in the lobby?"}
 }
+
+function GM:CreateConVars()
+	local dedicated = game.IsDedicated()
+	local settings = self.Settings
+	for i = 1, #settings do
+		local setting = settings[i]
+		if CLIENT and !dedicated and !setting.replicated then continue end
+
+		local flags = CLIENT and FCVAR_REPLICATED or FCVAR_ARCHIVE
+		if SERVER and setting.replicated then
+			flags = flags + FCVAR_REPLICATED
+		end
+
+		CreateConVar(setting.cvar, setting.default, flags, setting.help)
+	end
+end
 
 STATE_LOBBY = 0
 STATE_PROMPT = 1
@@ -49,6 +65,10 @@ function GM:Initialize()
 	SetRound(0)
 	SetRoundState(STATE_LOBBY)
 	SetRoundTime(CurTime())
+
+	if SERVER then
+		self:CreateConVars()
+	end
 end
 
 function GM:CreateTeams()

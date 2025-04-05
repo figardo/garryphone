@@ -1,7 +1,5 @@
 DEFINE_BASECLASS("gamemode_base")
 
-local infiniteTime = CreateConVar("gp_infinitetime", 0, FCVAR_REPLICATED)
-
 local function DrawBottomBar(scrw, scrh, height, bga, boa)
 	bga = bga or 200
 	boa = boa or 255
@@ -16,7 +14,12 @@ local function DrawBottomBar(scrw, scrh, height, bga, boa)
 end
 
 local timerFont = "GPBold"
+local infiniteTime
 local function DrawTimer(scrw, scrh)
+	if !infiniteTime then
+		infiniteTime = GetConVar("gp_infinitetime")
+	end
+
 	if infiniteTime:GetBool() then return end
 
 	local time = math.ceil(math.max(0, GetRoundTime() - CurTime()))

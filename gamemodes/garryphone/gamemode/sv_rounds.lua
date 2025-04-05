@@ -1,7 +1,3 @@
-local promptTime = CreateConVar("gp_prompttime", "30", FCVAR_ARCHIVE, "How long are players given to type a prompt?", 1)
-local buildTime = CreateConVar("gp_buildtime", "120", FCVAR_ARCHIVE, "How long are players given to build?", 1)
-local infiniteTime = CreateConVar("gp_infinitetime", 0, FCVAR_ARCHIVE + FCVAR_REPLICATED, "Move to next round when all players are ready instead of on a fixed timer.", 0, 1)
-
 local game_mode = CreateConVar("gp_gamemode", "default")
 
 -- playin sudoku
@@ -112,7 +108,12 @@ function GM:IsBuildRound(round)
 	return self.BuildRounds[round]
 end
 
+local promptTime
 function GM:SwitchToPrompt(curRound)
+	if !promptTime then
+		promptTime = GetConVar("gp_prompttime")
+	end
+
 	SetRoundTime(promptTime:GetFloat())
 
 	self.Ready = {}
@@ -157,7 +158,12 @@ function GM:SwitchToPrompt(curRound)
 	SetRoundState(STATE_PROMPT)
 end
 
+local buildTime
 function GM:SwitchToBuild(curRound)
+	if !buildTime then
+		buildTime = GetConVar("gp_buildtime")
+	end
+
 	SetRoundTime(buildTime:GetFloat())
 
 	if self.BuildRoundPlayed then
@@ -339,7 +345,12 @@ local function ReceivePrompt(_, ply)
 end
 net.Receive("GP_SendPrompt", ReceivePrompt)
 
+local infiniteTime
 function GM:DoRoundTime()
+	if !infiniteTime then
+		infiniteTime = GetConVar("gp_infinitetime")
+	end
+
 	if infiniteTime:GetBool() or GetRoundTime() > CurTime() then return end
 
 	self:NextRound()
