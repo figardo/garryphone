@@ -14,7 +14,10 @@ function GM:Initialize()
 end
 
 local function RemoveHooks(name)
-	for id, _ in pairs(hook.GetTable()[name]) do
+	local tbl = hook.GetTable()[name]
+	if !tbl or table.IsEmpty(tbl) then return end
+
+	for id, _ in pairs(tbl) do
 		hook.Remove(name, id)
 	end
 end
