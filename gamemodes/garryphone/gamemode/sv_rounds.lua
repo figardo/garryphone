@@ -116,10 +116,8 @@ function GM:SwitchToPrompt(curRound)
 
 	SetRoundTime(promptTime:GetFloat())
 
-	self.Ready = {}
-
 	for sid, data in pairs(self.PlayerData) do
-		self.Ready[sid] = false
+		SetReady(sid, false)
 	end
 
 	if curRound > 1 then
@@ -174,16 +172,14 @@ function GM:SwitchToBuild(curRound)
 		self.BuildRoundPlayed = true
 	end
 
-	self.Ready = {}
-
 	for sid, data in pairs(self.PlayerData) do
+		SetReady(sid, false)
+
 		local ply = data.ply
 		if !IsValid(ply) then continue end
 
 		ply:Spawn()
 		ply:SetBuildSpawn()
-
-		self.Ready[sid] = false
 
 		local recipient = self:GetRecipient(sid, 1)
 		local str = self.RoundData[recipient][curRound].data
@@ -339,8 +335,8 @@ local function ReceivePrompt(_, ply)
 
 	gm.RoundData[recipient][curRound].data = prompt
 
-	if !gm:GetReady(ply) then
-		gm:SetReady(ply, true)
+	if !ply:GetReady() then
+		ply:SetReady(true)
 	end
 end
 net.Receive("GP_SendPrompt", ReceivePrompt)
@@ -369,19 +365,23 @@ function GM:NextRound()
 	SetRound(curRound + 1)
 end
 
-local stateThinkFuncs = {
+local thinkStates = {
 	[STATE_PROMPT] = true,
 	[STATE_BUILD] = true
 }
 
 function GM:Think()
-	local shouldThink = stateThinkFuncs[GetRoundState()]
+	local shouldThink = thinkStates[GetRoundState()]
 	if !shouldThink then return end
 
 	self:DoRoundTime()
 
 	local ready = true
-	for _, done in pairs(self.Ready) do
+	for _, pdata in pairs(self.PlayerData) do
+		local ply = pdata.ply
+		if !IsValid(ply) then continue end
+
+		local done = ply:GetReady()
 		if !done then
 			ready = done
 			break

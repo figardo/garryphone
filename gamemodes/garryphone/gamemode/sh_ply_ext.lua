@@ -28,4 +28,12 @@ if SERVER then
 			net.WriteFloat(self.BuildSpawn.ang.y)
 		net.Send(self)
 	end
+
+	function meta:SetReady(bool)
+		SetReady(self:SteamID64(), bool)
+	end
+
+	function meta:GetReady()
+		return GetReady(self:SteamID64())
+	end
 end

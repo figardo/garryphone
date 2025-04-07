@@ -55,12 +55,13 @@ function GM:BuildsToDupes(round)
 	end
 end
 
-function GM:SetReady(ply, ready)
-	self.Ready[ply:SteamID64()] = ready
+local ready = {}
+function SetReady(sid, bool)
+	ready[sid] = bool
 end
 
-function GM:GetReady(ply)
-	return self.Ready[ply:SteamID64()]
+function GetReady(sid)
+	return ready[sid]
 end
 
 function GM:ShowSpare1(ply)
@@ -72,8 +73,8 @@ end
 function GM:ShowSpare2(ply)
 	if GetRoundState() != STATE_BUILD then return end
 
-	local old = self:GetReady(ply)
-	self:SetReady(ply, !old)
+	local old = ply:GetReady()
+	ply:SetReady(!old)
 
 	if !old then
 		ply:SetBuildSpawn()
