@@ -125,9 +125,10 @@ function GM:SwitchToPrompt(curRound)
 
 		for sid, data in pairs(self.PlayerData) do
 			local ply = data.ply
-			if !IsValid(ply) then continue end
-
-			ply:Spawn()
+			local validPly = IsValid(ply)
+			if validPly then
+				ply:Spawn()
+			end
 
 			local recipient = self:GetRecipient(sid, 1)
 
@@ -140,13 +141,18 @@ function GM:SwitchToPrompt(curRound)
 			for i = 1, #build do
 				local ent = build[i]
 
+				-- hide build from the builder
 				RecursiveSetPreventTransmit(ent, builder, true)
-				RecursiveSetPreventTransmit(ent, ply, false)
+
+				if validPly then
+					-- show build to the guesser
+					RecursiveSetPreventTransmit(ent, ply, false)
+				end
 
 				ent:SetNWEntity("GP_Owner", nil)
 			end
 
-			if build.pos and build.ang then
+			if validPly and build.pos and build.ang then
 				ply:SetPos(build.pos)
 				ply:SetEyeAngles(build.ang)
 			end
