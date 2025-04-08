@@ -3,39 +3,9 @@ DEFINE_BASECLASS("gamemode_sandbox")
 function GM:SaveBuilds(round, asdupe)
 	for id, data in pairs(undo.GetTable()) do
 		local ply = player.GetByUniqueID(id)
-		if !IsValid(player.GetByUniqueID(id)) or !data[1] then continue end
+		if !IsValid(ply) or !data[1] then continue end
 
-		local build = {}
-		for i = 1, #data do
-			data[i].Lock = true
-
-			local props = data[i].Entities
-			for j = 1, #props do
-				local prop = props[j]
-				-- HACK: there's probably a better way to ignore ents created for a constraint
-				if !IsValid(prop) or prop:IsConstraint() or prop:GetClass() == "gmod_winch_controller" then continue end
-
-				build[#build + 1] = prop
-			end
-		end
-
-		if asdupe then
-			build = duplicator.CopyEnts(build)
-		end
-
-		if ply.BuildSpawn and !table.IsEmpty(ply.BuildSpawn) then
-			build.pos = ply.BuildSpawn.pos
-			build.ang = ply.BuildSpawn.ang
-
-			ply.BuildSpawn = nil
-		else
-			build.pos = ply:GetPos()
-			build.ang = ply:EyeAngles()
-		end
-
-		local recipient = self:GetRecipient(ply)
-
-		self.RoundData[recipient][round].data = build
+		ply:SaveBuild(data, asdupe, round)
 	end
 end
 

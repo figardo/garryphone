@@ -58,6 +58,10 @@ function GM:PlayerSpawn(ply, transition)
 	BaseClass.PlayerSpawn(self, ply, transition)
 end
 
+function GM:PlayerDisconnected(ply)
+	ply:SaveBuild()
+end
+
 function GM:GetFallDamage()
 	return 0
 end
