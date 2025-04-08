@@ -149,6 +149,15 @@ local plyPnlCorner = ScreenScaleH(32 / 3)
 function GM:CreatePlayerPill(ply)
 	local scrw, scrh = ScrW(), ScrH()
 
+	local isReplay, name = isnumber(ply)
+	if isReplay then
+		local sid = self.Playing[ply]
+		name = self.PlayerData[sid].name
+		ply = self.PlayerData[sid].ply
+	elseif IsValid(ply) then
+		name = ply:Nick()
+	end
+
 	local slotPnl = vgui.Create("DPanel")
 	slotPnl:SetSize(scrw * 0.2, scrh * 0.05)
 	slotPnl:SetPaintedManually(true)
@@ -156,7 +165,7 @@ function GM:CreatePlayerPill(ply)
 	local pillPaint
 	if SHADERS then
 		pillPaint = function(s, w, h)
-			if !IsValid(ply) then
+			if !isReplay and !IsValid(ply) then
 				RNDX.Draw(plyPnlCorner, 0, 0, w, h, plyPnlBorder, RNDX.SHAPE_CIRCLE)
 
 				return false
@@ -174,7 +183,7 @@ function GM:CreatePlayerPill(ply)
 		pillPaint = function(s, w, h)
 			draw.RoundedBox(plyPnlCorner, 0, 0, w, h, plyPnlBorder)
 
-			if !IsValid(ply) then return false end
+			if !isReplay and !IsValid(ply) then return false end
 
 			local off = w * 0.01
 
@@ -198,16 +207,18 @@ function GM:CreatePlayerPill(ply)
 		surface.DrawText(txt)
 	end
 
-	if IsValid(ply) then
-		slotPnl.Text = ply:Nick()
+	if isReplay or IsValid(ply) then
+		slotPnl.Text = name
 
-		local avh = scrh * 0.03
+		if IsValid(ply) then
+			local avh = scrh * 0.03
 
-		local avPnl = vgui.Create("AvatarImage", slotPnl)
-		avPnl:SetSize(avh, avh)
-		avPnl:SetPos(slotPnl:GetWide() * 0.05, (slotPnl:GetTall() / 2) - scrh * 0.015)
-		avPnl:SetPlayer(ply, avh)
-		avPnl:SetPaintedManually(true)
+			local avPnl = vgui.Create("AvatarImage", slotPnl)
+			avPnl:SetSize(avh, avh)
+			avPnl:SetPos(slotPnl:GetWide() * 0.05, (slotPnl:GetTall() / 2) - scrh * 0.015)
+			avPnl:SetPlayer(ply, avh)
+			avPnl:SetPaintedManually(true)
+		end
 	end
 
 	return slotPnl
@@ -557,7 +568,14 @@ function GM:TwoSidedMenu(isReplay)
 		surface.SetTextColor(255, 255, 255, 255)
 		surface.SetFont("GPTitle")
 
-		local txt = language.GetPhrase("GarryPhone.Players"):format(#select(2, player.Iterator()), maxplys)
+		local ply1, ply2
+		if isReplay then
+			ply1, ply2 = self.CurPly or 1, #self.Playing
+		else
+			ply1, ply2 = #select(2, player.Iterator()), maxplys
+		end
+
+		local txt = language.GetPhrase("GarryPhone.Players"):format(ply1, ply2)
 		local th = select(2, surface.GetTextSize(txt))
 		surface.SetTextPos(scrw * 0.01, (h / 2) - (th / 2))
 
@@ -579,7 +597,7 @@ function GM:TwoSidedMenu(isReplay)
 		end
 	end
 
-	local plys = select(2, player.Iterator())
+	local plys = isReplay and self.Playing or select(2, player.Iterator())
 	local plyCount = isReplay and #plys or game.MaxPlayers()
 
 	if isReplay and !self.HighlightedPly then
@@ -589,9 +607,7 @@ function GM:TwoSidedMenu(isReplay)
 
 	local plysDone = 0
 	for i = 1, plyCount do
-		local ply = plys[i]
-		if isReplay and (!IsValid(ply) or ply:Team() != TEAM_PLAYING) then continue end
-
+		local ply = isReplay and i or plys[i]
 		local slotPnl = self:CreatePlayerPill(ply)
 
 		if isReplay then
@@ -656,6 +672,23 @@ function GM:StartGame()
 	net.Start("GP_StartGame")
 	net.SendToServer()
 end
+
+function GM:NewRound()
+	self.PlayerData = {}
+	self.Playing = {}
+
+	local plys = select(2, player.Iterator())
+	for i = 1, #plys do
+		local ply = plys[i]
+		if ply:Team() == TEAM_SPECTATOR then continue end
+
+		local sid = ply:SteamID64()
+
+		self.PlayerData[sid] = {ply = ply, name = ply:Nick()}
+		table.insert(self.Playing, sid)
+	end
+end
+net.Receive("GP_NewRound", function() GAMEMODE:NewRound() end)
 
 local menuFuncs = {
 	[STATE_LOBBY] = function(gm)
