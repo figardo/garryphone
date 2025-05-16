@@ -59,6 +59,8 @@ function GM:PlayerSpawn(ply, transition)
 end
 
 function GM:PlayerDisconnected(ply)
+	if GetRoundState() != STATE_BUILD then return end
+
 	ply:SaveBuild()
 end
 
