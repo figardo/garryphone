@@ -13,26 +13,8 @@ function GM:Initialize()
 	self.LobbyOpen = false
 end
 
-local function RemoveHooks(name)
-	local tbl = hook.GetTable()[name]
-	if !tbl or table.IsEmpty(tbl) then return end
-
-	for id, _ in pairs(tbl) do
-		hook.Remove(name, id)
-	end
-end
-
-local hooksToRemove = {
-	"ScoreboardShow",
-	"ScoreboardHide"
-}
-
 function GM:InitPostEntity()
 	self:CreateConVars()
-
-	for i = 1, #hooksToRemove do
-		RemoveHooks(hooksToRemove[i])
-	end
 end
 
 local function GenerateFonts()

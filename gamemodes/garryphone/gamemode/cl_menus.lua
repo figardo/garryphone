@@ -723,16 +723,21 @@ local menuFuncs = {
 	end
 }
 
-function GM:ScoreboardShow()
-	if !self.MenuLock then
+local function ScoreboardShow()
+	local gm = GAMEMODE
+	if !gm.MenuLock then
 		local fn = menuFuncs[GetRoundState()]
 		if fn then
-			return fn(self)
+			return fn(gm)
 		end
 	end
-
-	return BaseClass.ScoreboardShow(self)
 end
+
+-- do this in a hook so that addons like lambda players don't break the menus
+hook.Add("ScoreboardShow", "GP_ScoreboardShow", ScoreboardShow)
+
+-- just in case
+concommand.Add("gp_menu", ScoreboardShow)
 
 function GM:OnPauseMenuShow()
 	if self.MenuOpen and !self.MenuLock then
