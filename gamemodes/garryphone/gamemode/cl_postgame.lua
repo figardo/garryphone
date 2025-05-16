@@ -340,7 +340,7 @@ local function ReceiveRound()
 		gm.PostText = language.GetPhrase("GarryPhone.BuiltBy"):format(author)
 
 		if authority then
-			local tab = input.LookupBinding("+showscores") or "NOT BOUND"
+			local tab = input.LookupBinding("+showscores") or "NOT BOUND (scoreboard)"
 			gm.PostText = gm.PostText .. " " .. language.GetPhrase("GarryPhone.ViewResults"):format(tab)
 		end
 	end

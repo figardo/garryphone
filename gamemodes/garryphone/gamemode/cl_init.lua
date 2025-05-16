@@ -95,7 +95,7 @@ local stateSwitchFuncs = {
 
 		gm.PostText = language.GetPhrase("GarryPhone.GameOver")
 		if LocalPlayer():HasAuthority() then
-			local tab = input.LookupBinding("+showscores") or "NOT BOUND"
+			local tab = input.LookupBinding("+showscores") or "NOT BOUND (scoreboard)"
 			gm.PostText = gm.PostText .. " " .. language.GetPhrase("GarryPhone.ViewResults"):format(tab)
 		end
 
