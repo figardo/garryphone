@@ -43,6 +43,9 @@ function GM:StartGame()
 	self.PlayerData = {}
 	self.Playing = {}
 
+	self.RoundData = {}
+	self.BuildRounds = {}
+
 	local plys = select(2, player.Iterator())
 	for i = 1, #plys do
 		local ply = plys[i]
@@ -71,9 +74,6 @@ function GM:StartGame()
 	local gm = game_mode:GetString()
 	local orderFn = self.Gamemodes[gm] or self.Gamemodes["default"]
 	orderFn = orderFn.order
-
-	self.RoundData = {}
-	self.BuildRounds = {}
 
 	for i = 1, plyCount do
 		local sid = self.Playing[i]
