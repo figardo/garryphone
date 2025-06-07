@@ -39,6 +39,8 @@ if SERVER then
 
 	function meta:SaveBuild(data, asdupe, round)
 		data = data or undo.GetTable()[self:UniqueID()]
+		if !data then return end
+
 		round = round or GetRound()
 
 		local build = {}

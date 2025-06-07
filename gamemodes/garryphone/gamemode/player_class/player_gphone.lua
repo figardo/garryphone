@@ -4,6 +4,89 @@ DEFINE_BASECLASS( "player_sandbox" )
 
 local PLAYER = {}
 
+function PLAYER:Init()
+	local rs = GetRoundState()
+	if rs != STATE_PROMPT and rs != STATE_BUILD then return end
+
+	local plydata = GAMEMODE.PlayerData
+	if !plydata or table.IsEmpty(plydata) then return end
+
+	local ply = self.Player
+	local sid = ply:SteamID64()
+	local mydata = plydata[sid]
+	if !mydata or table.IsEmpty(mydata) then
+		ply:ChatPrint("Game already in progress! You will be spectator until the game ends.")
+		ply:SetTeam(TEAM_SPECTATOR)
+
+		if CLIENT then
+			local gm = GAMEMODE
+
+			gm:OnSpawnMenuClose()
+
+			gm.MenuLock = false
+			gm:KillMenuScreen(true)
+		end
+
+		return
+	end
+
+	if CLIENT then return end
+
+	ply:SetTeam(TEAM_PLAYING)
+	mydata.ply = ply
+
+	-- hide every other player from us (we are hidden to them by PLAYER:Spawn)
+	for _, p in player.Iterator() do
+		if p == ply then continue end
+
+		RecursiveSetPreventTransmit(p, ply, true)
+
+		-- hide this player's build from us
+		local data = undo.GetTable()[p:UniqueID()]
+		if !data then continue end
+		for i = 1, #data do
+			local props = data[i].Entities
+			if !props then continue end
+
+			for j = 1, #props do
+				local prop = props[j]
+				RecursiveSetPreventTransmit(prop, ply, true)
+			end
+		end
+	end
+
+	-- if we need to network something to this player then we wait for them to send GP_Reconnected first (init.lua)
+	if rs == STATE_PROMPT then
+		-- GM:SwitchToPrompt
+		local curRound = GetRound()
+		if curRound == 1 then return end
+
+		local recipient = GAMEMODE:GetRecipient(sid)
+
+		local buildData = GAMEMODE.RoundData[recipient][curRound - 1]
+		local build = buildData.data
+		if !build then return end
+
+		for i = 1, #build do
+			local ent = build[i]
+
+			-- show the build we were meant to be guessing
+			RecursiveSetPreventTransmit(ent, ply, false)
+		end
+
+		if build.pos and build.ang then
+			ply:SetPos(build.pos)
+			ply:SetEyeAngles(build.ang)
+		end
+	elseif rs == STATE_BUILD then
+		-- GM:SwitchToBuild
+		SetReady(sid, false)
+
+		ply:Spawn()
+		ply:SetBuildSpawn()
+	end
+end
+
 function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()
 

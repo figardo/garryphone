@@ -219,6 +219,8 @@ function GM:EndGame(curRound)
 		for _, ply2 in player.Iterator() do
 			RecursiveSetPreventTransmit(ply, ply2, false)
 		end
+
+		ply:SetTeam(TEAM_PLAYING)
 	end
 
 	self.CurPly = 1

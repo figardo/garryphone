@@ -14,6 +14,12 @@ function GM:Initialize()
 end
 
 function GM:InitPostEntity()
+	local rs = GetRoundState()
+	if rs != STATE_LOBBY then
+		net.Start("GP_Reconnected")
+		net.SendToServer()
+	end
+
 	self:CreateConVars()
 end
 
@@ -68,6 +74,8 @@ local stateSwitchFuncs = {
 		gm.RoundSaved = false
 	end,
 	[STATE_PROMPT] = function(gm)
+		if LocalPlayer():Team() == TEAM_SPECTATOR then return end
+
 		gm:OnSpawnMenuClose()
 
 		gm.MenuLock = true
@@ -78,6 +86,8 @@ local stateSwitchFuncs = {
 		return online
 	end,
 	[STATE_BUILD] = function(gm)
+		if LocalPlayer():Team() == TEAM_SPECTATOR then return end
+
 		gm:ScoreboardHide()
 
 		gm.MenuLock = true
@@ -123,7 +133,7 @@ function GM:Think()
 	if (newrs == STATE_PROMPT or newrs == STATE_BUILD) and !infiniteTime:GetBool() then
 		local time = math.ceil(math.max(0, GetRoundTime() - CurTime()))
 		if time <= 5 and time != 0 then
-			if time < lastAlert then
+			if !lastAlert or time < lastAlert then
 				surface.PlaySound(message)
 				lastAlert = time
 			end
@@ -156,7 +166,7 @@ local function ReceivePrompt()
 	prompt = prompt or ""
 
 	local pnl = GAMEMODE.TextPanel
-	if IsValid(pnl) and pnl:GetClassName() == "DTextEntry" then
+	if IsValid(pnl) and pnl.SetPlaceholderText then
 		pnl:SetPlaceholderText(prompt)
 	end
 
@@ -199,3 +209,27 @@ local function Ready()
 	GAMEMODE.Ready = net.ReadBool()
 end
 net.Receive("GP_Ready", Ready)
+
+local maxplybits = bitsRequired(game.MaxPlayers())
+local function Reconnected()
+	GAMEMODE.Playing = {}
+	GAMEMODE.PlayerData = {}
+
+	local numplys = net.ReadUInt(maxplybits)
+	local ply, sid, nick
+	for i = 1, numplys do
+		if net.ReadBool() then -- it's me!
+			ply = LocalPlayer()
+			sid = ply:SteamID64()
+			nick = ply:Nick()
+		else
+			ply = net.ReadPlayer()
+			sid = net.ReadUInt64()
+			nick = net.ReadString()
+		end
+
+		GAMEMODE.PlayerData[sid] = {ply = ply, name = nick}
+		GAMEMODE.Playing[i] = sid
+	end
+end
+net.Receive("GP_Reconnected", Reconnected)

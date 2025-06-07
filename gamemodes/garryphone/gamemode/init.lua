@@ -39,6 +39,7 @@ util.AddNetworkString("GP_ChangeSetting")
 util.AddNetworkString("GP_Ready")
 util.AddNetworkString("GP_SaveGame")
 util.AddNetworkString("GP_SetSpawn")
+util.AddNetworkString("GP_Reconnected")
 
 function GM:InitPostEntity()
 	local callbacks = concommand.GetTable()
@@ -114,12 +115,18 @@ function RecursiveSetPreventTransmit(ent, ply, stopTransmitting)
 end
 
 function GM:GetRecipient(ply, roundoffset)
+	if !ply then
+		error("GM:GetRecipient ply is nil!")
+	end
+
 	if isentity(ply) then ply = ply:SteamID64() end
 	roundoffset = roundoffset or 0
 
 	return self.PlayerData[ply].order[GetRound() + roundoffset]
 end
 
+
+-- LOBBY
 local function StartGame(_, ply)
 	if !ply:HasAuthority() then return end
 
@@ -127,6 +134,76 @@ local function StartGame(_, ply)
 end
 net.Receive("GP_StartGame", StartGame)
 
+local function BackToLobby(_, ply)
+	if GetRoundState() != STATE_POST or !ply:HasAuthority() then return end
+
+	SetRoundState(STATE_LOBBY)
+
+	game.CleanUpMap()
+end
+net.Receive("GP_BackToLobby", BackToLobby)
+
+local function ChangeSetting(_, ply)
+	if GetRoundState() != STATE_LOBBY or !ply:HasAuthority() then return end
+
+	local settings = GAMEMODE.Settings
+	local setting = settings[net.ReadUInt(bitsRequired(#settings)) + 1]
+	if !setting then return end
+
+	local cvar = GetConVar(setting.cvar)
+	if setting.type == "checkbox" then
+		cvar:SetBool(!cvar:GetBool())
+	elseif setting.type == "num" then
+		cvar:SetInt(net.ReadUInt(32))
+	else
+		cvar:SetString(net.ReadString())
+	end
+end
+net.Receive("GP_ChangeSetting", ChangeSetting)
+
+
+-- MID-GAME
+local maxplybits = bitsRequired(game.MaxPlayers())
+local function Reconnected(_, ply)
+	-- anything that needs to be networked to our reconnected client goes here, otherwise see PLAYER:Init
+	local plydata = GAMEMODE.PlayerData
+	local mydata = plydata[ply:SteamID64()]
+
+	local rs = GetRoundState()
+	if rs == STATE_LOBBY then return end
+
+	if mydata and !table.IsEmpty(mydata) and rs == STATE_BUILD then
+		-- GM:SwitchToBuild
+		local recipient = GAMEMODE:GetRecipient(ply)
+		local str = GAMEMODE.RoundData[recipient][GetRound() - 1].data
+		if !str then str = "" end
+
+		net.Start("GP_SendPrompt")
+			net.WriteString(str)
+		net.Send(ply)
+	end
+
+	local plys = GAMEMODE.Playing
+	net.Start("GP_Reconnected")
+		net.WriteUInt(#plys, maxplybits)
+		for i = 1, #plys do
+			local sid = plys[i]
+			local data = plydata[sid]
+
+			local isMe = data.ply == ply
+			net.WriteBool(isMe)
+			if isMe then continue end
+
+			net.WritePlayer(data.ply)
+			net.WriteUInt64(sid)
+			net.WriteString(data.name)
+		end
+	net.Send(ply)
+end
+net.Receive("GP_Reconnected", Reconnected)
+
+
+-- POST
 local function LoadNextRound(_, ply)
 	if !ply:HasAuthority() then return end
 
@@ -158,18 +235,6 @@ local function RevealPrompt(_, ply)
 end
 net.Receive("GP_RevealPrompt", RevealPrompt)
 
-local commands = {
-	["!end"] = function(ply) if !ply:HasAuthority() then return end SetRoundState(STATE_POST) GAMEMODE:EndGame() end
-}
-
-gameevent.Listen( "player_say" )
-hook.Add( "player_say", "player_say_example", function( data )
-	local ply = Player(data.userid)
-	local text = data.text
-
-	if commands[text:lower()] then commands[text:lower()](ply) end
-end )
-
 local function SendResults(_, ply)
 	if !ply:HasAuthority() then return end
 
@@ -179,33 +244,8 @@ local function SendResults(_, ply)
 end
 net.Receive("GP_ShowResults", SendResults)
 
-local function BackToLobby(_, ply)
-	if GetRoundState() != STATE_POST or !ply:HasAuthority() then return end
 
-	SetRoundState(STATE_LOBBY)
-
-	game.CleanUpMap()
-end
-net.Receive("GP_BackToLobby", BackToLobby)
-
-local function ChangeSetting(_, ply)
-	if GetRoundState() != STATE_LOBBY or !ply:HasAuthority() then return end
-
-	local settings = GAMEMODE.Settings
-	local setting = settings[net.ReadUInt(bitsRequired(#settings)) + 1]
-	if !setting then return end
-
-	local cvar = GetConVar(setting.cvar)
-	if setting.type == "checkbox" then
-		cvar:SetBool(!cvar:GetBool())
-	elseif setting.type == "num" then
-		cvar:SetInt(net.ReadUInt(32))
-	else
-		cvar:SetString(net.ReadString())
-	end
-end
-net.Receive("GP_ChangeSetting", ChangeSetting)
-
+-- SAVE/LOAD
 local function SaveGame(_, ply)
 	if GetRoundState() != STATE_POST or !ply:HasAuthority() then return end
 
@@ -291,3 +331,17 @@ end, function(cmd)
 
 	return files
 end)
+
+
+-- DEBUG
+local commands = {
+	["!end"] = function(ply) if !ply:HasAuthority() then return end SetRoundState(STATE_POST) GAMEMODE:EndGame() end
+}
+
+gameevent.Listen( "player_say" )
+hook.Add( "player_say", "player_say_example", function( data )
+	local ply = Player(data.userid)
+	local text = data.text
+
+	if commands[text:lower()] then commands[text:lower()](ply) end
+end )

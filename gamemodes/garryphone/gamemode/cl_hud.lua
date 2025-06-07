@@ -69,17 +69,28 @@ local statePaintFuncs = {
 		return 0.05, txt
 	end,
 	[STATE_PROMPT] = function(gm)
-		if GetRound() == 1 then
-			if !gm.MenuOpen then gm.MenuOpen = true end
-			return 0.05, nil, true
+		local plyteam = LocalPlayer():Team()
+		if plyteam == TEAM_PLAYING then
+			if GetRound() == 1 then
+				if !gm.MenuOpen then gm.MenuOpen = true end
+				return 0.05, nil, true
+			else
+				if gm.MenuOpen then gm.MenuOpen = false end
+			end
 		else
-			if gm.MenuOpen then gm.MenuOpen = false end
+			gm.MenuOpen = false
+			return 0.05, team.GetName(plyteam), true
 		end
 
 		return 0.1, "#GarryPhone.Describe", true
 	end,
 	[STATE_BUILD] = function(gm)
 		if gm.MenuOpen then gm.MenuOpen = false end
+
+		local plyteam = LocalPlayer():Team()
+		if plyteam == TEAM_SPECTATOR then
+			return 0.05, team.GetName(plyteam), true
+		end
 
 		local ent = gm.ReadyMark
 		if IsValid(gm.ReadyMark) then
@@ -91,30 +102,32 @@ local statePaintFuncs = {
 		return 0.1, "#GarryPhone.Build", true
 	end,
 	[STATE_POST] = function(gm)
+		local ret1, ret2 = 0.05, gm.PostText
+
 		local rdata = gm.RoundData
-		if rdata then
-			rdata = gm.RoundData[gm.CurPly]
-			if rdata then
-				local lastdata = #rdata
-				if lastdata >= 3 and lastdata % 2 != 0 then
-					local ent = rdata[lastdata - 1].data
-					if ent and IsValid(ent) and isentity(ent) then
-						local data = rdata[lastdata]
-						local author = isentity(data.author) and data.author:Nick() or data.author
-						local text = language.GetPhrase("GarryPhone.ThoughtThisWas"):format(author, data.data)
+		if !rdata then return ret1, ret2 end
 
-						AddWorldTip( nil, text, nil, ent:GetPos(), ent )
-					end
-				end
-			end
-		end
+		rdata = gm.RoundData[gm.CurPly]
+		if !rdata then return ret1, ret2 end
 
-		return 0.05, gm.PostText
+		local lastdata = #rdata
+		if lastdata < 3 or lastdata % 2 == 0 then return ret1, ret2 end
+
+		local ent = rdata[lastdata - 1].data
+		if !ent or !IsValid(ent) or !isentity(ent) then return ret1, ret2 end
+
+		local data = rdata[lastdata]
+		local author = isentity(data.author) and data.author:Nick() or data.author
+		local text = language.GetPhrase("GarryPhone.ThoughtThisWas"):format(author, data.data)
+
+		AddWorldTip( nil, text, nil, ent:GetPos(), ent )
 	end
 }
 
 local statePostPaintFuncs = {
 	[STATE_BUILD] = function(gm, scrw, scrh)
+		if LocalPlayer():Team() == TEAM_SPECTATOR then return end
+
 		local showspare2 = input.LookupBinding("gm_showspare2") or "not bound (gm_showspare2)"
 		local txt = language.GetPhrase("GarryPhone.Ready") .. " (" .. showspare2:upper() .. ") " .. (gm.Ready and "[✓]" or "[ ]")
 

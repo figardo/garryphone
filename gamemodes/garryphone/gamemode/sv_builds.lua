@@ -173,50 +173,57 @@ end
 
 local buildStates = {
 	[STATE_LOBBY] = true,
-	[STATE_BUILD] = true,
+	[STATE_BUILD] = function(ply) return ply:Team() == TEAM_PLAYING end,
 	[STATE_POST] = true
 }
 
+local function SpawnCheck(ply)
+	local check = buildStates[GetRoundState()]
+	if isfunction(check) then return check(ply) end
+
+	return check
+end
+
 function GM:PlayerSpawnEffect(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 local gp_allownpcs = CreateConVar("gp_allownpcs", "1", FCVAR_ARCHIVE, "Allow spawning NPCs.", 0, 1)
 function GM:PlayerSpawnNPC(ply)
-	return gp_allownpcs:GetBool() and buildStates[GetRoundState()]
+	return gp_allownpcs:GetBool() and SpawnCheck(ply)
 end
 
 function GM:PlayerSpawnObject(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 function GM:PlayerSpawnProp(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 function GM:PlayerSpawnRagdoll(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 local gp_allowsents = CreateConVar("gp_allowsents", "0", FCVAR_ARCHIVE, "Allow spawning SENTs. This can potentially break things!", 0, 1)
 function GM:PlayerSpawnSENT(ply)
-	return gp_allowsents:GetBool() and buildStates[GetRoundState()]
+	return gp_allowsents:GetBool() and SpawnCheck(ply)
 end
 
 function GM:PlayerSpawnSWEP(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 function GM:PlayerSpawnVehicle(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 function GM:CanTool(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 function GM:CanDrive(ply)
-	return buildStates[GetRoundState()]
+	return SpawnCheck(ply)
 end
 
 function GM:PlayerGiveSWEP(ply, wep, tbl)

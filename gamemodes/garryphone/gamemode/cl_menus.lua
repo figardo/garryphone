@@ -168,6 +168,10 @@ function GM:CreatePlayerPill(ply)
 			if !isReplay and !IsValid(ply) then
 				RNDX.Draw(plyPnlCorner, 0, 0, w, h, plyPnlBorder, RNDX.SHAPE_CIRCLE)
 
+				if IsValid(slotPnl.Avatar) then
+					slotPnl.Avatar:Remove()
+				end
+
 				return false
 			end
 
@@ -183,7 +187,13 @@ function GM:CreatePlayerPill(ply)
 		pillPaint = function(s, w, h)
 			draw.RoundedBox(plyPnlCorner, 0, 0, w, h, plyPnlBorder)
 
-			if !isReplay and !IsValid(ply) then return false end
+			if !isReplay and !IsValid(ply) then
+				if IsValid(slotPnl.Avatar) then
+					slotPnl.Avatar:Remove()
+				end
+
+				return false
+			end
 
 			local off = w * 0.01
 
@@ -218,6 +228,8 @@ function GM:CreatePlayerPill(ply)
 			avPnl:SetPos(slotPnl:GetWide() * 0.05, (slotPnl:GetTall() / 2) - scrh * 0.015)
 			avPnl:SetPlayer(ply, avh)
 			avPnl:SetPaintedManually(true)
+
+			slotPnl.Avatar = avPnl
 		end
 	end
 
@@ -547,6 +559,14 @@ function GM:TwoSidedMenu(isReplay)
 	parent:SetPos(scrw * 0.125, py)
 	parent:SetSize(scrw * 0.75, ph)
 	parent.Paint = nil
+
+	if isReplay then
+		parent.Think = function(s)
+			if GetRoundState() == STATE_POST then return end
+
+			GAMEMODE.MenuOpen = false
+		end
+	end
 
 	local plyParent = vgui.Create("DPanel", parent)
 	plyParent:Dock(LEFT)
