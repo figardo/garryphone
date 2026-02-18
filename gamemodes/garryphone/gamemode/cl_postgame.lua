@@ -286,17 +286,6 @@ function GM:CreateEndButtons()
 	end
 end
 
-local function bitsRequired(num)
-	local bits, max = 0, 1
-
-	while max <= num do
-		bits = bits + 1
-		max = max + max
-	end
-
-	return bits
-end
-
 local plyBits = bitsRequired(game.MaxPlayers())
 
 local function ReceiveRound()
