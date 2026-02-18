@@ -334,14 +334,8 @@ end)
 
 
 -- DEBUG
-local commands = {
-	["!end"] = function(ply) if !ply:HasAuthority() then return end SetRoundState(STATE_POST) GAMEMODE:EndGame() end
-}
+concommand.Add("gp_endgame", function(ply)
+	if !ply:HasAuthority() then return end
 
-gameevent.Listen( "player_say" )
-hook.Add( "player_say", "player_say_example", function( data )
-	local ply = Player(data.userid)
-	local text = data.text
-
-	if commands[text:lower()] then commands[text:lower()](ply) end
-end )
+	GAMEMODE:EndGame()
+end)
