@@ -223,109 +223,12 @@ function GM:EndGame(curRound)
 		ply:SetTeam(TEAM_PLAYING)
 	end
 
-	self.CurPly = 1
-	self.CurRound = 0
+	self.PostgamePly = 1
+	self.PostgameRound = 0
 
 	SetRoundState(STATE_POST)
 
 	-- PrintTable(self.RoundData)
-end
-
-local plyBits = bitsRequired(game.MaxPlayers())
-
-local sid, data, authorID, author, authorName
-function GM:LoadNextRound()
-	local playing = self.Playing
-	local numplaying = #playing
-
-	self.CurRound = self.CurRound + 1
-
-	if self.CurRound > numplaying then
-		self.CurPly = self.CurPly + 1
-		self.CurRound = 1
-	end
-
-	local gameOver = self.CurPly > numplaying
-	local isBuild = self:IsBuildRound(self.CurRound)
-
-	if !gameOver then
-		sid = playing[self.CurPly]
-		data = self.RoundData[sid][self.CurRound]
-
-		authorID = data.author
-		author = self.PlayerData[authorID].ply
-		authorName = self.PlayerData[authorID].name
-
-		data = data.data
-
-		if isBuild then
-			game.CleanUpMap()
-		end
-	end
-
-	net.Start("GP_SendRound")
-
-	net.WriteUInt(self.CurPly, plyBits)
-	net.WriteUInt(self.CurRound, plyBits)
-
-	if gameOver then
-		net.WriteUInt(STATE_POST, 2) -- no rounds remaining
-		net.Broadcast()
-
-		return
-	end
-
-	net.WriteUInt(isBuild and STATE_BUILD or STATE_PROMPT, 2)
-
-	local authorValid = IsValid(author)
-	net.WriteBool(authorValid)
-
-	if authorValid then
-		net.WritePlayer(author)
-	else
-		net.WriteString(authorName)
-	end
-
-	if !isBuild then -- prompt
-		local valid = isstring(data)
-		net.WriteBool(valid)
-
-		if valid then
-			net.WriteString(data)
-		end
-	end
-
-	net.Broadcast()
-end
-
-function GM:ShowBuild()
-	if !data or isstring(data) then return end
-
-	for _, ply in player.Iterator() do
-		ply:Spawn()
-
-		if data.pos and data.ang then
-			ply:SetPos(data.pos)
-			ply:SetEyeAngles(data.ang)
-		end
-	end
-
-	data = duplicator.Paste(self.PlayerData[authorID].ply, data.Entities, data.Constraints)
-
-	if #data == 0 then return end
-
-	local ent
-	for i = 1, #data do
-		ent = data[i]
-		local valid = IsValid(ent) and ent:EntIndex()
-		if valid then break end
-	end
-
-	if !IsValid(ent) then return end
-
-	net.Start("GP_ShowBuild")
-		net.WriteUInt(ent:EntIndex(), MAX_EDICT_BITS)
-	net.Broadcast()
 end
 
 local function ReceivePrompt(_, ply)

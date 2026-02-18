@@ -107,7 +107,7 @@ local statePaintFuncs = {
 		local rdata = gm.RoundData
 		if !rdata then return ret1, ret2 end
 
-		rdata = gm.RoundData[gm.CurPly]
+		rdata = gm.RoundData[gm.PostgamePly]
 		if !rdata then return ret1, ret2 end
 
 		local lastdata = #rdata

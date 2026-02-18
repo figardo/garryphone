@@ -590,7 +590,7 @@ function GM:TwoSidedMenu(isReplay)
 
 		local ply1, ply2
 		if isReplay then
-			ply1, ply2 = self.CurPly or 1, #self.Playing
+			ply1, ply2 = self.PostgamePly or 1, #self.Playing
 		else
 			ply1, ply2 = #select(2, player.Iterator()), maxplys
 		end

@@ -10,7 +10,7 @@ function GM:CreatePostScreen()
 		self:CreateEndButtons()
 	end
 
-	local curPly = self.NextPly and self.CurPly - 1 or self.CurPly
+	local curPly = self.NextPly and self.PostgamePly - 1 or self.PostgamePly
 	if curPly then
 		if !self.RoundData[curPly] then return end
 
@@ -199,7 +199,7 @@ function GM:RevealPrompt(nextPly, pnl)
 
 		parent:Clear()
 
-		local curPly = self.CurPly
+		local curPly = self.PostgamePly
 		local plys = self.PlyPnl:GetItems()
 		plys[curPly - 1].Highlighted = false
 		plys[curPly].Highlighted = true
@@ -239,12 +239,12 @@ function GM:CreateNextButton()
 		parent:Clear()
 
 		local plyPnls = self.PlyPnl:GetItems()
-		plyPnls[self.CurPly - 1].Highlighted = false
-		plyPnls[self.CurPly].Highlighted = true
-		self.HighlightedPly = self.CurPly
-		self.AlbumText = language.GetPhrase("GarryPhone.Album"):format(plyPnls[self.CurPly].Text)
+		plyPnls[self.PostgamePly - 1].Highlighted = false
+		plyPnls[self.PostgamePly].Highlighted = true
+		self.HighlightedPly = self.PostgamePly
+		self.AlbumText = language.GetPhrase("GarryPhone.Album"):format(plyPnls[self.PostgamePly].Text)
 
-		parent:AddItem(self:CreateReplayEntry(self.CurPly, 1))
+		parent:AddItem(self:CreateReplayEntry(self.PostgamePly, 1))
 
 		self.NextPly = false
 
@@ -306,8 +306,8 @@ local function ReceiveRound()
 		return
 	end
 
-	gm.CurPly = curPly
-	gm.CurRound = curRound
+	gm.PostgamePly = curPly
+	gm.PostgameRound = curRound
 
 	local author = net.ReadBool() and net.ReadPlayer() or net.ReadString()
 
@@ -321,7 +321,7 @@ local function ReceiveRound()
 	local roundData = gm.RoundData
 	if !roundData[curPly] then roundData[curPly] = {} end
 
-	roundData[curPly][gm.CurRound] = {author = author, data = data or "(" .. language.GetPhrase("GarryPhone.NoResult") .. ")", prompt = isPrompt, revealed = false}
+	roundData[curPly][gm.PostgameRound] = {author = author, data = data or "(" .. language.GetPhrase("GarryPhone.NoResult") .. ")", prompt = isPrompt, revealed = false}
 
 	local authority = LocalPlayer():HasAuthority()
 	if !isPrompt then
@@ -334,7 +334,7 @@ local function ReceiveRound()
 		end
 	end
 
-	if gm.CurRound == 1 and curPly != 1 then
+	if gm.PostgameRound == 1 and curPly != 1 then
 		gm.NextPly = true
 
 		if authority then
@@ -346,7 +346,7 @@ local function ReceiveRound()
 
 	if !IsValid(parent) then return end
 
-	parent:AddItem(gm:CreateReplayEntry(gm.CurPly, gm.CurRound))
+	parent:AddItem(gm:CreateReplayEntry(gm.PostgamePly, gm.PostgameRound))
 end
 net.Receive("GP_SendRound", ReceiveRound)
 
@@ -358,6 +358,6 @@ local function ShowBuild()
 	if !IsValid(ent) then return end
 
 	local gm = GAMEMODE
-	gm.RoundData[gm.CurPly][gm.CurRound].data = ent
+	gm.RoundData[gm.PostgamePly][gm.PostgameRound].data = ent
 end
 net.Receive("GP_ShowBuild", ShowBuild)

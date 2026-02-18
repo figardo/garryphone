@@ -21,6 +21,7 @@ AddCSLuaFile("cl_postgame.lua")
 include("sv_builds.lua")
 include("sv_rounds.lua")
 include("sv_gamemodes.lua")
+include("sv_postgame.lua")
 
 local vguiLua = file.Find("garryphone/gamemode/vgui/*", "LUA")
 for i = 1, #vguiLua do
@@ -201,48 +202,6 @@ local function Reconnected(_, ply)
 	net.Send(ply)
 end
 net.Receive("GP_Reconnected", Reconnected)
-
-
--- POST
-local function LoadNextRound(_, ply)
-	if !ply:HasAuthority() then return end
-
-	GAMEMODE:LoadNextRound()
-end
-net.Receive("GP_SendRound", LoadNextRound)
-
-local function RevealPrompt(_, ply)
-	if !ply:HasAuthority() then return end
-
-	local gm = GAMEMODE
-	if gm.CurRound == 1 and gm.CurPly != 1 then
-		if !gm.NextPly then
-			gm.NextPly = false
-		else
-			game.CleanUpMap()
-		end
-
-		gm.NextPly = !gm.NextPly
-	end
-
-	if gm:IsBuildRound(gm.CurRound) then
-		gm:ShowBuild()
-	end
-
-	net.Start("GP_RevealPrompt")
-		net.WriteBool(gm.NextPly) -- did the host click "NEXT" instead of the chat button
-	net.SendOmit(ply)
-end
-net.Receive("GP_RevealPrompt", RevealPrompt)
-
-local function SendResults(_, ply)
-	if !ply:HasAuthority() then return end
-
-	net.Start("GP_ShowResults")
-		net.WriteBool(net.ReadBool())
-	net.SendOmit(ply)
-end
-net.Receive("GP_ShowResults", SendResults)
 
 
 -- SAVE/LOAD

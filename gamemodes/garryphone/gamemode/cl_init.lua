@@ -111,8 +111,8 @@ local stateSwitchFuncs = {
 
 		gm.RoundData = {}
 
-		gm.CurPly = nil
-		gm.CurRound = nil
+		gm.PostgamePly = nil
+		gm.PostgameRound = nil
 		gm.HighlightedPly = 1
 		gm.AlbumText = language.GetPhrase("GarryPhone.Album"):format(Entity(1):Nick())
 		gm.NextPly = false
