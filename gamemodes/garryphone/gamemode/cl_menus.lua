@@ -95,6 +95,8 @@ local function DrawPromptScreen()
 end
 
 function GM:CreateMenu(customdraw)
+	if IsValid(self.MenuPanel) then self.MenuPanel:Remove() end
+
 	gui.EnableScreenClicker(true)
 
 	local pnl = vgui.Create("DPanel")
