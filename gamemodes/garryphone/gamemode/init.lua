@@ -144,6 +144,7 @@ local function BackToLobby(_, ply)
 end
 net.Receive("GP_BackToLobby", BackToLobby)
 
+local bitsRequired = util.BitsRequired
 local function ChangeSetting(_, ply)
 	if GetRoundState() != STATE_LOBBY or !ply:HasAuthority() then return end
 

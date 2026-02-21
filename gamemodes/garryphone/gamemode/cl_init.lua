@@ -214,7 +214,7 @@ local function Ready()
 end
 net.Receive("GP_Ready", Ready)
 
-local maxplybits = bitsRequired(game.MaxPlayers())
+local maxplybits = util.BitsRequired(game.MaxPlayers())
 local function Reconnected()
 	GAMEMODE.Playing = {}
 	GAMEMODE.PlayerData = {}

@@ -272,6 +272,8 @@ function GM:CreateMenuButton(txt, x, notButton)
 	return start
 end
 
+local bitsRequired = util.BitsRequired
+
 local check = "✓"
 local grey = Color(128, 128, 128)
 local settingTypes = {

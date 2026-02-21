@@ -1,4 +1,4 @@
-local plyBits = bitsRequired(game.MaxPlayers())
+local plyBits = util.BitsRequired(game.MaxPlayers())
 
 local data, authorSID, authorEnt, authorName
 function GM:PostgameLoadNextRound()

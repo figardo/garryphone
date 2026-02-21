@@ -286,8 +286,7 @@ function GM:CreateEndButtons()
 	end
 end
 
-local plyBits = bitsRequired(game.MaxPlayers())
-
+local plyBits = util.BitsRequired(game.MaxPlayers())
 local function ReceiveRound()
 	local gm = GAMEMODE
 	local parent = gm.ReplayPnl

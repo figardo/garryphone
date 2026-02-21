@@ -100,7 +100,7 @@ function GM:CanTool()
 	return toolStates[GetRoundState()]
 end
 
-function bitsRequired(num)
+function util.BitsRequired(num)
 	local bits, max = 0, 1
 
 	while max <= num do
