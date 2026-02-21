@@ -72,6 +72,10 @@ local stateSwitchFuncs = {
 	[STATE_LOBBY] = function(gm)
 		gm.GameOver = false
 		gm.RoundSaved = false
+		gm.MenuLock = false
+		gm.MenuOpen = false
+
+		gm:KillMenuScreen()
 	end,
 	[STATE_PROMPT] = function(gm)
 		if LocalPlayer():Team() == TEAM_SPECTATOR then return end
