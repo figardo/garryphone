@@ -80,7 +80,7 @@ function PLAYER:Init()
 		end
 	elseif rs == STATE_BUILD then
 		-- GM:SwitchToBuild
-		SetReady(sid, false)
+		ply:SetReady(false)
 
 		ply:Spawn()
 		ply:SetBuildSpawn()

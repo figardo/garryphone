@@ -25,13 +25,12 @@ function GM:BuildsToDupes(round)
 	end
 end
 
-local ready = {}
-function SetReady(sid, bool)
-	ready[sid] = bool
+function GM:SetReady(sid, bool)
+	self.PlayerReady[sid] = bool
 end
 
-function GetReady(sid)
-	return ready[sid]
+function GM:GetReady(sid)
+	return self.PlayerReady[sid]
 end
 
 function GM:ShowSpare1(ply)

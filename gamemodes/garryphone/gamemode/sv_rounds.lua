@@ -42,6 +42,7 @@ function GM:StartGame()
 
 	self.PlayerData = {}
 	self.Playing = {}
+	self.PlayerReady = {}
 
 	self.RoundData = {}
 	self.BuildRounds = {}
@@ -117,7 +118,7 @@ function GM:SwitchToPrompt(curRound)
 	SetRoundTime(promptTime:GetFloat())
 
 	for sid, data in pairs(self.PlayerData) do
-		SetReady(sid, false)
+		self:SetReady(sid, false)
 	end
 
 	if curRound > 1 then
@@ -179,7 +180,7 @@ function GM:SwitchToBuild(curRound)
 	end
 
 	for sid, data in pairs(self.PlayerData) do
-		SetReady(sid, false)
+		self:SetReady(sid, false)
 
 		local ply = data.ply
 		if !IsValid(ply) then continue end

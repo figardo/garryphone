@@ -30,11 +30,11 @@ if SERVER then
 	end
 
 	function meta:SetReady(bool)
-		SetReady(self:SteamID64(), bool)
+		GAMEMODE:SetReady(self:SteamID64(), bool)
 	end
 
 	function meta:GetReady()
-		return GetReady(self:SteamID64())
+		return GAMEMODE:GetReady(self:SteamID64())
 	end
 
 	function meta:SaveBuild(data, asdupe, round)
