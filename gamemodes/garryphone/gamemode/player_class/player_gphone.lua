@@ -106,7 +106,8 @@ function PLAYER:Spawn()
 		self.Player:Spawn()
 	end
 
-	self.Player:SetCustomCollisionCheck(true) -- disable player to player collisions
+	self.Player:SetNoCollideWithTeammates(true) -- disable player/player collisions
+	self.Player:SetCustomCollisionCheck(true) -- disable player/other build collisions
 	self.Player:CollisionRulesChanged()
 
 	local rs = GetRoundState()

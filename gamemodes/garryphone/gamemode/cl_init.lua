@@ -125,16 +125,11 @@ local stateSwitchFuncs = {
 	end
 }
 
-local infiniteTime
 local rs, lastAlert
 function GM:Think()
 	local newrs = GetRoundState()
 
-	if !infiniteTime then
-		infiniteTime = GetConVar("gp_infinitetime")
-	end
-
-	if (newrs == STATE_PROMPT or newrs == STATE_BUILD) and !infiniteTime:GetBool() then
+	if (newrs == STATE_PROMPT or newrs == STATE_BUILD) and !self.ConVars["gp_infinitetime"]:GetBool() then
 		local time = math.ceil(math.max(0, GetRoundTime() - CurTime()))
 		if time <= 5 and time != 0 then
 			if !lastAlert or time < lastAlert then

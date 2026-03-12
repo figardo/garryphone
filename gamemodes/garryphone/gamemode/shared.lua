@@ -15,6 +15,8 @@ GM.Settings = {
 function GM:CreateConVars()
 	local dedicated = game.IsDedicated()
 	local settings = self.Settings
+	self.ConVars = {}
+
 	for i = 1, #settings do
 		local setting = settings[i]
 		if CLIENT and !dedicated and !setting.replicated then continue end
@@ -24,7 +26,7 @@ function GM:CreateConVars()
 			flags = flags + FCVAR_REPLICATED
 		end
 
-		CreateConVar(setting.cvar, setting.default, flags, setting.help)
+		self.ConVars[setting.cvar] = CreateConVar(setting.cvar, setting.default, flags, setting.help)
 	end
 end
 
@@ -79,7 +81,7 @@ function GM:ShouldCollide(ent1, ent2)
 	if ent1:IsWorld() or ent2:IsWorld() then return true end
 
 	if ent1:IsPlayer() then
-		if ent2:IsPlayer() then return false end
+		if ent2:IsPlayer() then return true end
 
 		return ent1 == ent2:GetNWEntity("GP_Owner")
 	end

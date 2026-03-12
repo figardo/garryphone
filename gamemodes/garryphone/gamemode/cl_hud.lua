@@ -14,13 +14,8 @@ local function DrawBottomBar(scrw, scrh, height, bga, boa)
 end
 
 local timerFont = "GPBold"
-local infiniteTime
 local function DrawTimer(scrw, scrh)
-	if !infiniteTime then
-		infiniteTime = GetConVar("gp_infinitetime")
-	end
-
-	if infiniteTime:GetBool() then return end
+	if GAMEMODE.ConVars["gp_infinitetime"]:GetBool() then return end
 
 	local time = math.ceil(math.max(0, GetRoundTime() - CurTime()))
 

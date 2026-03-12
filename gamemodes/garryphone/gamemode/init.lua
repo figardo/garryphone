@@ -70,14 +70,9 @@ function GM:GetFallDamage()
 	return 0
 end
 
-local lobbyPVP
 function GM:PlayerShouldTakeDamage()
-	if !lobbyPVP then
-		lobbyPVP = GetConVar("gp_lobbypvp")
-	end
-
 	local rs = GetRoundState()
-	if rs == STATE_LOBBY then return lobbyPVP:GetBool() end
+	if rs == STATE_LOBBY then return self.ConVars["gp_lobbypvp"]:GetBool() end
 
 	if rs != STATE_POST then return false end
 
@@ -90,7 +85,7 @@ local defaultWeps = {
 	["weapon_physgun"] = true
 }
 function GM:PlayerCanPickupWeapon(ply, wep)
-	return defaultWeps[wep:GetClass()]
+	return GetRoundState() == STATE_LOBBY or defaultWeps[wep:GetClass()]
 end
 
 function GM:PreventTransmitAll(ent, exception, stopTransmitting)

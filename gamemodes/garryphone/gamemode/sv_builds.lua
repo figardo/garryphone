@@ -226,8 +226,11 @@ function GM:CanDrive(ply)
 end
 
 function GM:PlayerGiveSWEP(ply, wep, tbl)
-	Spawn_Weapon(ply, wep)
+	if GetRoundState() == STATE_LOBBY then
+		return true
+	end
 
+	Spawn_Weapon(ply, wep)
 	return false
 end
 

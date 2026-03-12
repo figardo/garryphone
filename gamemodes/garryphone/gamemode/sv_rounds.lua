@@ -94,15 +94,16 @@ function GM:StartGame()
 		self.BuildRounds[i] = orderFn(i, plyCount)
 	end
 
-	for _, ply in player.Iterator() do
-		ply:Spawn()
-	end
-
 	net.Start("GP_NewRound")
 	net.Broadcast()
 
 	SetRound(1)
 	self:SwitchToPrompt(1)
+
+	for _, ply in player.Iterator() do
+		ply:StripWeapons()
+		ply:Spawn()
+	end
 end
 
 function GM:IsBuildRound(round)
